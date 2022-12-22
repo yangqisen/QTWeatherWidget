@@ -5,6 +5,7 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include "DayWeatherFile.h"
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,10 +24,18 @@ private:
     Ui::MainWindow *ui;
     void Replied(QNetworkReply *reply);
     void queryW(QString city);
+    void update();
 
     //右键退出所需
     QMenu * exitMenu;
     QAction* exitAction;
+
+    //控件数组
+    QList<QLabel*> weeks;
+    QList<QLabel*> dates;
+    QList<QLabel*> kongqis;
+    QList<QLabel*> weathers;
+    QList<QLabel*> weatherIcons;
 
     QPoint clickOffset;//点击拖拽时鼠标位置与窗口左上角的偏移量
 
@@ -34,6 +43,8 @@ private:
 
     DayLeft dayleft;//左边天气数据
     DayRight dayright[6];    //右边六天天气数据
+
+    QMap<QString, QString> weatherIconMap;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *rightevent);

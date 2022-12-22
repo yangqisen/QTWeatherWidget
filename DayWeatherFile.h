@@ -18,6 +18,8 @@ public:
     QString Weather; //气象，如多云、小雨等
     int HighestT;//最高温度
     int lowestT;//最低温度
+    QString fx;
+    QString fl;
 };
 
 class DayRight{
