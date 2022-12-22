@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include "getCityCode.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -75,8 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
     weatherIconMap.insert("中到大雪" , ":/res/icon/ZhongDaoDaXue.png");
     weatherIconMap.insert("中雨" , ":/res/icon/ZhongYu.png");
     weatherIconMap.insert("中雪" , ":/res/icon/ZhongXue.png");
-
-
 }
 
 MainWindow::~MainWindow()
@@ -161,9 +160,14 @@ void MainWindow::Replied(QNetworkReply *reply)
 }
 
 //获取某个城市天气数据 http://t.weather.itboy.net/api/weather/city/
-void MainWindow::queryW(QString city)
+void MainWindow::queryW(QString cityName)
 {
-    QUrl url("http://t.weather.itboy.net/api/weather/city/" + city);
+    QString cityCode = queryCityCode(cityName);
+    if(cityCode.isEmpty()){
+        QMessageBox::warning(this, "错误", "请检查城市名是否正确!", QMessageBox::Ok);
+        return;
+    }
+    QUrl url("http://t.weather.itboy.net/api/weather/city/" + cityCode);
     networkAM->get(QNetworkRequest(url));
 }
 
@@ -239,4 +243,21 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
     this->move(event->globalPos() - clickOffset);
 }
 
+QString MainWindow::queryCityCode(QString cityName)
+{
+    QMap<QString, QString>::iterator iterator = getCityCode.cityCodeMap.find(cityName);
+    if(iterator == getCityCode.cityCodeMap.end()) iterator = getCityCode.cityCodeMap.find(cityName + "市");
 
+    if(iterator != getCityCode.cityCodeMap.end()) return iterator.value();
+
+    return "";
+}
+
+
+
+
+void MainWindow::on_btnSearch_clicked()
+{
+    QString cityName = ui->leCity->text();
+    queryW(cityName);
+}

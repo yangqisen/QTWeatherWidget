@@ -6,6 +6,7 @@
 #include <QNetworkAccessManager>
 #include "DayWeatherFile.h"
 #include <QLabel>
+#include "getCityCode.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -45,6 +46,8 @@ private:
     DayRight dayright[6];    //右边六天天气数据
 
     QMap<QString, QString> weatherIconMap;
+    getCityCode getCityCode;//获取城市编码
+
 
 protected:
     void contextMenuEvent(QContextMenuEvent *rightevent);
@@ -52,5 +55,8 @@ protected:
     //实现鼠标点击拖动窗口
     void mousePressEvent(QMouseEvent* event);//鼠标点击获取鼠标位置
     void mouseMoveEvent(QMouseEvent* event);
+    QString queryCityCode(QString cityName);
+private slots:
+    void on_btnSearch_clicked();
 };
 #endif // MAINWINDOW_H

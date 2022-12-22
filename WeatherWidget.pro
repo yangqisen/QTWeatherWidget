@@ -21,6 +21,7 @@ SOURCES += \
 
 HEADERS += \
     DayWeatherFile.h \
+    getCityCode.h \
     mainwindow.h
 
 FORMS += \
