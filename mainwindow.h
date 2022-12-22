@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include "DayWeatherFile.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,6 +31,9 @@ private:
     QPoint clickOffset;//点击拖拽时鼠标位置与窗口左上角的偏移量
 
     QNetworkAccessManager* networkAM;
+
+    DayLeft dayleft;//左边天气数据
+    DayRight dayright[6];    //右边六天天气数据
 
 protected:
     void contextMenuEvent(QContextMenuEvent *rightevent);

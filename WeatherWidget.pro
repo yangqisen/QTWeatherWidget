@@ -20,6 +20,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    DayWeatherFile.h \
     mainwindow.h
 
 FORMS += \
