@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     dates << ui->lblDate0 << ui->lblDate1 << ui->lblDate2 << ui->lblDate3<< ui->lblDate4 << ui->lblDate5;
     weatherIcons << ui->lblTypeIcon0 << ui->lblTypeIcon1 << ui->lblTypeIcon2 << ui->lblTypeIcon3<< ui->lblTypeIcon4 << ui->lblTypeIcon5;
     kongqis << ui->lblQuality0 << ui->lblQuality1 << ui->lblQuality2 << ui->lblQuality3<< ui->lblQuality4 << ui->lblQuality5;
+    highs << ui->lblHigh0 << ui->lblHigh1 << ui->lblHigh2 << ui->lblHigh3<< ui->lblHigh4 << ui->lblHigh5;
+    lows << ui->lblLow0 << ui->lblLow1 << ui->lblLow2 << ui->lblLow3<< ui->lblLow4 << ui->lblLow5;
     //关联获取到天气数据后的槽函数
     networkAM = new QNetworkAccessManager(this);
     connect(networkAM, &QNetworkAccessManager::finished, this,&MainWindow::Replied);
@@ -149,7 +151,8 @@ void MainWindow::Replied(QNetworkReply *reply)
     QJsonObject rightdayObj = forecastArray[1].toObject();
     dayleft.fx = rightdayObj.value("fx").toString();
     dayleft.fl = rightdayObj.value("fl").toString();
-    dayleft.wendu = dataObj.value("wendu").toInt();
+    dayleft.wendu = dataObj.value("wendu").toString().toDouble();
+    qDebug() << "" << dayleft.wendu;
     dayleft.ganmaozhishu = dataObj.value("ganmao").toString();
     dayleft.HighestT = dayright[1].HighestT;
     dayleft.lowestT = dayright[1].lowestT;
@@ -193,6 +196,8 @@ void MainWindow::update()
         qDebug() << "" << dates[i];
         weathers[i]->setText(dayright[i].Weather);
         weatherIcons[i]->setStyleSheet("border-image: url(" + weatherIconMap[dayright[i].Weather] + ");");
+        highs[i]->setText("高温 " + QString::number(dayright[i].HighestT) + "℃" );
+        lows[i]->setText("低温 " + QString::number(dayright[i].lowestT) + "℃" );
         if(dayright[i].kongqi > 0 && dayright[i].kongqi <= 50){
             kongqis[i]->setStyleSheet("color: rgb(85, 255, 0);");
             kongqis[i]->setText("优");

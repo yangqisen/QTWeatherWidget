@@ -37,6 +37,8 @@ private:
     QList<QLabel*> kongqis;
     QList<QLabel*> weathers;
     QList<QLabel*> weatherIcons;
+    QList<QLabel*> highs;
+    QList<QLabel*> lows;
 
     QPoint clickOffset;//点击拖拽时鼠标位置与窗口左上角的偏移量
 
