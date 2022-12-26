@@ -21,10 +21,8 @@ public:
             QString s = QString(line);
             QString city = s.split("=").at(0);
             city = city.mid(0, city.length()-1);
-            qDebug() << "" << city;
             QString code = s.split("=").at(1);
             code = code.mid(1, code.length()-2);
-            qDebug() << "" << code;
             cityCodeMap.insert(city, code);
         }
     }

@@ -26,6 +26,7 @@ private:
     void Replied(QNetworkReply *reply);
     void queryW(QString city);
     void update();
+    void getLocalCity();
 
     //右键退出所需
     QMenu * exitMenu;
@@ -49,7 +50,8 @@ private:
 
     QMap<QString, QString> weatherIconMap;
     getCityCode getCityCode;//获取城市编码
-
+    QNetworkAccessManager* m_pNet;
+    QString cityName;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *rightevent);
@@ -58,7 +60,10 @@ protected:
     void mousePressEvent(QMouseEvent* event);//鼠标点击获取鼠标位置
     void mouseMoveEvent(QMouseEvent* event);
     QString queryCityCode(QString cityName);
+
+
 private slots:
     void on_btnSearch_clicked();
+    void CityReplyFinished();
 };
 #endif // MAINWINDOW_H

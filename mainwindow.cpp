@@ -10,13 +10,16 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "getCityCode.h"
-
+#include <QHostInfo>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QTextCodec>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::MainWindow),
+    m_pNet(new QNetworkAccessManager(this))
 {
     ui->setupUi(this);
-
     //窗口无边框
     setWindowFlag(Qt::FramelessWindowHint);
 
@@ -42,7 +45,8 @@ MainWindow::MainWindow(QWidget *parent)
     networkAM = new QNetworkAccessManager(this);
     connect(networkAM, &QNetworkAccessManager::finished, this,&MainWindow::Replied);
 
-    queryW("广州");
+    getLocalCity();
+
 
     //封装图标
     weatherIconMap.insert("暴雪" , ":/res/icon/BaoXue.png");
@@ -78,6 +82,9 @@ MainWindow::MainWindow(QWidget *parent)
     weatherIconMap.insert("中到大雪" , ":/res/icon/ZhongDaoDaXue.png");
     weatherIconMap.insert("中雨" , ":/res/icon/ZhongYu.png");
     weatherIconMap.insert("中雪" , ":/res/icon/ZhongXue.png");
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -158,6 +165,8 @@ void MainWindow::Replied(QNetworkReply *reply)
     dayleft.lowestT = dayright[1].lowestT;
     dayleft.Weather = dayright[1].Weather;
     dayleft.date = dayright[1].date;
+
+    reply->deleteLater();
     //更新
     update();
 }
@@ -227,6 +236,18 @@ void MainWindow::update()
     weeks[1]->setText("今天");
 }
 
+void MainWindow::getLocalCity()
+{
+    const QString& strUrl=QString("http://api.map.baidu.com/location/ip?ak=W1f9o2ZdMGtbjy8Vb5j6D8NX5GeCbDfO&coor=bd09ll");
+
+    QNetworkRequest request;
+    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
+    request.setUrl(QUrl(strUrl));
+    QNetworkReply* reply =m_pNet->get(request);
+    connect(reply,SIGNAL(finished()),this,SLOT(CityReplyFinished()));
+    qDebug() << "" << cityName;
+}
+
 //右键菜单事件
 void MainWindow::contextMenuEvent(QContextMenuEvent *rightevent)
 {
@@ -258,9 +279,36 @@ QString MainWindow::queryCityCode(QString cityName)
     return "";
 }
 
+void MainWindow::CityReplyFinished()
+{
+    QNetworkReply* reply=qobject_cast<QNetworkReply *>(sender());
+    qDebug() << "11111";
+    if(reply->error()!=QNetworkReply::NoError){
+            QMessageBox::information(this,QStringLiteral("提示"),QStringLiteral("请求出错:%1").arg(reply->errorString()));
+    }
 
+    //解析城市数据
+    QTextCodec *code = QTextCodec::codecForName("UTF-8");
+    QByteArray arr = reply->readAll();
+    QByteArray msgUtf8 = code->fromUnicode(arr);//转码后的数据msgUtf8
+    qDebug() << "" << msgUtf8.data();
+    QJsonParseError error;
+    QJsonDocument docu = QJsonDocument::fromJson(arr, &error);
+    if(error.error!=QJsonParseError::NoError){
+        QMessageBox::information(this,QStringLiteral("提示"),QStringLiteral("JSON:数据结构有问题！"));
+        return;
+    }
+    QJsonObject obj = docu.object();
+    QJsonObject contentObj = obj.value("content").toObject();
+    QJsonObject detailObj = contentObj.value("address_detail").toObject();
+    cityName = detailObj.value("city").toString();
+    cityName = cityName.mid(0, cityName.length() - 1);
+    reply->deleteLater();
+    queryW(cityName);
+    qDebug() << "" << cityName;
+}
 
-
+//查询事件
 void MainWindow::on_btnSearch_clicked()
 {
     QString cityName = ui->leCity->text();
